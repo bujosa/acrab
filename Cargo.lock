@@ -11,8 +11,6 @@ dependencies = [
  "google-cloud-gax 0.13.0",
  "google-cloud-googleapis",
  "google-cloud-pubsub",
- "serde",
- "serde_json",
  "tokio",
  "tokio-util",
 ]
