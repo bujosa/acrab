@@ -6,9 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-google-cloud-pubsub = "0.13.0"
-google-cloud-default = { version = "0.1.0", features = ["pubsub"] }
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-google-cloud-gax = "0.13.0"
-google-cloud-googleapis = "0.7.0"
 google-authenticator = "0.3.0"
+google-cloud-pubsub = "0.14.1"
+google-cloud-gax = "0.13.0"
+google-cloud-default = { version = "0.1.0", features = ["pubsub"] }
+google-cloud-googleapis = { version = "0.8.0", features = ["pubsub"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio-util = "0.7.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.93"
