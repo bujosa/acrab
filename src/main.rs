@@ -1,10 +1,8 @@
 use google_cloud_default::WithAuthExt;
 use google_cloud_gax::grpc::Status;
 use google_cloud_googleapis::pubsub::v1::PubsubMessage;
-use google_cloud_pubsub::{
-    client::{Client, ClientConfig},
-    subscription::SubscriptionConfig,
-};
+use google_cloud_pubsub::client::{Client, ClientConfig};
+use std::str;
 use std::time::Duration;
 use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
@@ -68,25 +66,8 @@ async fn subscriber() -> Result<(), Status> {
 
     let client = Client::new(config).await.unwrap();
 
-    // Get the topic to subscribe to.
-    let topic = client.topic("projects/curbo-dev/topics/example");
-
     // Create subscription
-    // If subscription name does not contain a "/", then the project is taken from client above. Otherwise, the
-    // name will be treated as a fully qualified resource name
-    let config = SubscriptionConfig {
-        // Enable message ordering if needed (https://cloud.google.com/pubsub/docs/ordering)
-        enable_message_ordering: true,
-        ..Default::default()
-    };
-
-    // Create subscription
-    let subscription = client.subscription("test-example-2");
-    if !subscription.exists(None).await? {
-        subscription
-            .create(topic.fully_qualified_name(), config, None)
-            .await?;
-    }
+    let subscription = client.subscription("projects/curbo-dev/subscriptions/test-subscriptions");
 
     // Token for cancel.
     let cancel = CancellationToken::new();
@@ -101,9 +82,9 @@ async fn subscriber() -> Result<(), Status> {
     // Or simply use the `subscription.subscribe` method.
     subscription
         .receive(
-            |mut message, cancel| async move {
-                // Handle data.
-                println!("Got Message: {:?}", message.message.data);
+            |message, cancel| async move {
+                let data = str::from_utf8(&message.message.data).unwrap();
+                println!("Got Message: {}", data);
 
                 // Ack or Nack message.
                 let _ = message.ack().await;
@@ -112,9 +93,6 @@ async fn subscriber() -> Result<(), Status> {
             None,
         )
         .await?;
-
-    // Delete subscription if needed.
-    subscription.delete(None).await?;
 
     Ok(())
 }
